@@ -1,17 +1,11 @@
 ---
 name: work-management
-description: Use SQL to find and manage jobs on the Db2 for i database
-metadata:
-  version: "1.0"
+description: "Query, monitor, and analyze jobs on IBM i using SQL table functions via ibmi-mcp-server. Use when user asks about: (1) finding jobs by status, user, subsystem, or type, (2) monitoring active job performance (CPU, I/O, memory), (3) detecting long-running SQL statements, (4) analyzing lock contention, (5) checking job queues, (6) replacing WRKACTJOB, WRKUSRJOB, WRKSBSJOB, WRKSBMJOB commands, or (7) any IBM i work management task."
 ---
 
 # IBM i Work Management & Job Monitoring
 
 Query, monitor, and analyze jobs on IBM i using SQL table functions `QSYS2.JOB_INFO` and `QSYS2.ACTIVE_JOB_INFO`.
-
-## When to use this Skill
-
-Use this skill when the user asks questions or needs assistant with managing and inspecting Jobs on their IBM i system. 
 
 ## Available Tools
 
@@ -185,11 +179,45 @@ Job identity, status, function, CPU usage, memory, I/O counts, elapsed statistic
 7. **Combine services** - Join with JOBLOG_INFO, PRESTART_JOB_INFO, etc.
 8. **Check active SQL** - Filter SQL_STATEMENT_STATUS = 'ACTIVE' for running queries
 
+## Quick Examples
+
+### Get current job info
+```sql
+SELECT * FROM TABLE(QSYS2.ACTIVE_JOB_INFO(JOB_NAME_FILTER => '*')) X;
+```
+
+### Find top CPU consumers
+```sql
+SELECT JOB_NAME, AUTHORIZATION_NAME, CPU_TIME
+  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(SUBSYSTEM_LIST_FILTER => 'QUSRWRK,QBATCH'))
+  ORDER BY CPU_TIME DESC LIMIT 10;
+```
+
+### Find jobs on job queue
+```sql
+SELECT * FROM TABLE(QSYS2.JOB_INFO(JOB_STATUS_FILTER => '*JOBQ')) X;
+```
+
+### Find long-running SQL statements
+```sql
+SELECT JOB_NAME, AUTHORIZATION_NAME,
+       TIMESTAMPDIFF(2, CAST(CURRENT_TIMESTAMP - SQL_STATEMENT_START_TIMESTAMP AS CHAR(22))) AS SECONDS,
+       SQL_STATEMENT_TEXT
+  FROM TABLE(QSYS2.ACTIVE_JOB_INFO(DETAILED_INFO => 'ALL'))
+  WHERE SQL_STATEMENT_STATUS = 'ACTIVE'
+  ORDER BY SECONDS DESC;
+```
+
+### Find jobs for a specific user
+```sql
+SELECT * FROM TABLE(QSYS2.JOB_INFO(JOB_USER_FILTER => 'USERNAME')) X;
+```
+
 ## Reference Documentation
 
 - [JOB_INFO Reference](./references/job-info-docs.md) - Complete parameters and columns
 - [ACTIVE_JOB_INFO Reference](./references/active-job-info-docs.md) - Complete parameters and columns
-- [Example SQL Scripts](./assests/work-mangement-and-jobs.sql) - Working query examples
+- [Example SQL Patterns](./references/work-management-and-jobs.sql) - Working query examples
 - [IBM ACTIVE_JOB_INFO](https://www.ibm.com/support/pages/node/1128579) - Enhancement history
 - [IBM JOB_INFO](https://www.ibm.com/support/pages/node/1128615) - Enhancement history
 

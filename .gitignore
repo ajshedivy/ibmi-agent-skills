@@ -13,3 +13,4 @@ wheels/
 .mcp.json
 
 .claude
+tmp/
