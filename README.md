@@ -3,14 +3,36 @@ Agent skills for AI coding assistants to work with IBM i systems.
 
 ## What are Agent Skills?
 
+Agents are increasingly capable, but often don’t have the context they need to do real work reliably. Skills solve this by giving agents access to procedural knowledge and **company**, **team**, and **user-specific context** they can load on demand. Agents with access to a set of skills can extend their capabilities based on the task they’re working on.
 
-Agent skills are reusable instruction sets that extend your coding agent's capabilities. They're defined in SKILL.md files with YAML frontmatter containing a name and description.
+## Creating a Basic Skill
 
-Skills let agents perform specialized tasks like:
+Skills are simple to create - just a folder with a `SKILL.md` file containing YAML frontmatter and instructions. You can use the **template-skill** in this repository as a starting point:
 
-- Generating release notes from git history
-- Creating PRs following your team's conventions
-- Integrating with external tools (Linear, Notion, etc.)
+```markdown
+---
+name: my-skill-name
+description: A clear description of what this skill does and when to use it
+---
+
+# My Skill Name
+
+[Add your instructions here that the Agent will follow when this skill is active]
+
+## Examples
+- Example usage 1
+- Example usage 2
+
+## Guidelines
+- Guideline 1
+- Guideline 2
+```
+
+The frontmatter requires only two fields:
+- `name` - A unique identifier for your skill (lowercase, hyphens for spaces)
+- `description` - A complete description of what the skill does and when to use it
+
+The markdown content below contains the instructions, examples, and guidelines that the Agent will follow.
 
 [**Agent Skills Documentation**](https://agentskills.io/home)
 
